@@ -26,32 +26,32 @@ template<class T, uint16_t Size, bool checkRange = true>
 class array {
 public:
     typedef T type;
-    static const uint16_t size = Size;
 
     type& operator[](uint16_t n) {
         if(checkRange)
-            ASSERT(n < size);
+            ASSERT(n < Size);
         return Data[n];
     }
 
     const type& operator[](uint16_t n) const {
         if(checkRange)
-            ASSERT(n < size);
+            ASSERT(n < Size);
         return Data[n];
     }
 
+    uint16_t size() const { return Size; }
+
 private:
-    type Data[size];
+    type Data[Size];
 };
 
 template<uint16_t Size, bool checkRange>
 class array<bool, Size, checkRange> {
 public:
     typedef bool type;
-    static const uint16_t size = Size;
 
 private:
-    static const uint16_t K = (size + 7U) / 8U;
+    static const uint16_t Size8 = (Size + 7U) / 8U;
 
     class bool8 {
         uint8_t Data;
@@ -83,18 +83,20 @@ public:
 
     typeref operator[](uint16_t n) {
         if(checkRange)
-            ASSERT(n < size);
+            ASSERT(n < Size);
         return typeref(Data[n / 8], n % 8);
     }
 
     type operator[](uint16_t n) const {
         if(checkRange)
-            ASSERT(n < size);
+            ASSERT(n < Size);
         return Data[n / 8].get(n % 8);
     }
 
+    uint16_t size() const { return Size; }
+
 private:
-    bool8 Data[K];
+    bool8 Data[Size8];
 };
 
 }
