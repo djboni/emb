@@ -22,26 +22,26 @@
 
 namespace emb {
 
-template<class T, uint16_t N, bool checkRange = true>
+template<class T, uint16_t Size, bool checkRange = true>
 class array {
 public:
     typedef T type;
-    static const uint16_t size = N;
+    static const uint16_t size = Size;
 
     type& operator[](uint16_t n) {
         if(checkRange)
-            ASSERT(n < N);
+            ASSERT(n < size);
         return Data[n];
     }
 
     const type& operator[](uint16_t n) const {
         if(checkRange)
-            ASSERT(n < N);
+            ASSERT(n < size);
         return Data[n];
     }
 
 private:
-    type Data[N];
+    type Data[size];
 };
 
 }
