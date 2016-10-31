@@ -44,6 +44,59 @@ private:
     type Data[size];
 };
 
+template<uint16_t Size, bool checkRange>
+class array<bool, Size, checkRange> {
+public:
+    typedef bool type;
+    static const uint16_t size = Size;
+
+private:
+    static const uint16_t K = (size + 7U) / 8U;
+
+    class bool8 {
+        uint8_t Data;
+    public:
+        bool get(uint8_t n) const {
+            return (Data >> n) & 1U;
+        }
+        void set(uint8_t n, bool val) {
+            if(val)
+                Data |= (1U << n);
+            else
+                Data &= ~(1U << n);
+        }
+    };
+
+public:
+    class typeref {
+        uint8_t pos;
+        bool8* data;
+        typeref() {}
+    public:
+        typeref(bool8& d, uint8_t n): pos(n), data(&d) {}
+        operator bool() const { return data->get(pos); }
+        typeref& operator=(bool val) {
+            data->set(pos, val);
+            return *this;
+        }
+    };
+
+    typeref operator[](uint16_t n) {
+        if(checkRange)
+            ASSERT(n < size);
+        return typeref(Data[n / 8], n % 8);
+    }
+
+    type operator[](uint16_t n) const {
+        if(checkRange)
+            ASSERT(n < size);
+        return Data[n / 8].get(n % 8);
+    }
+
+private:
+    bool8 Data[K];
+};
+
 }
 
 #endif //__ARRAY_H__
