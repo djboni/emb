@@ -45,16 +45,16 @@ private:
     type Data[Size];
 };
 
-template<uint16_t Size, bool checkRange = true>
+template<uint16_t Size, class T = uint8_t, bool checkRange = true>
 class bit_array {
 public:
     typedef bool type;
 
 private:
-    static const uint16_t Size8 = (Size + 7U) / 8U;
+    static const uint16_t SizeX = (Size + 8U * sizeof(T) - 1U) / (8U * sizeof(T));
 
-    class bool8 {
-        uint8_t Data;
+    class boolX {
+        T Data;
     public:
         bool get(uint8_t n) const {
             return (Data >> n) & 1U;
@@ -70,10 +70,10 @@ private:
 public:
     class typeref {
         uint8_t pos;
-        bool8* data;
+        boolX* data;
         typeref() {}
     public:
-        typeref(bool8& d, uint8_t n): pos(n), data(&d) {}
+        typeref(boolX& d, uint8_t n): pos(n), data(&d) {}
         operator bool() const { return data->get(pos); }
         typeref& operator=(bool val) {
             data->set(pos, val);
@@ -96,7 +96,7 @@ public:
     uint16_t size() const { return Size; }
 
 private:
-    bool8 Data[Size8];
+    boolX Data[SizeX];
 };
 
 }
