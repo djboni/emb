@@ -45,8 +45,8 @@ private:
     type Data[Size];
 };
 
-template<uint16_t Size, bool checkRange>
-class array<bool, Size, checkRange> {
+template<uint16_t Size, bool checkRange = true>
+class bit_array {
 public:
     typedef bool type;
 
