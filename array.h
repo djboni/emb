@@ -97,7 +97,7 @@ public:
     uint16_t size() const { return Size; }
 
 private:
-    boolX Data[SizeX];
+    array<boolX, SizeX, checkRange> Data;
 };
 
 }
