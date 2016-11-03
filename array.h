@@ -62,9 +62,9 @@ private:
         }
         void set(uint8_t n, bool val) {
             if(val)
-                Data |= (1U << n);
+                Data |= ((T)1U << n);
             else
-                Data &= ~(1U << n);
+                Data &= ~((T)1U << n);
         }
     };
 
