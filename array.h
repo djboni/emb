@@ -51,7 +51,8 @@ public:
     typedef bool type;
 
 private:
-    static const uint16_t SizeX = (Size + 8U * sizeof(T) - 1U) / (8U * sizeof(T));
+    static const uint16_t BitsX = 8U * sizeof(T);
+    static const uint16_t SizeX = (Size + BitsX - 1U) / BitsX;
 
     class boolX {
         T Data;
@@ -84,13 +85,13 @@ public:
     typeref operator[](uint16_t n) {
         if(checkRange)
             ASSERT(n < Size);
-        return typeref(Data[n / 8], n % 8);
+        return typeref(Data[n / BitsX], n % BitsX);
     }
 
     type operator[](uint16_t n) const {
         if(checkRange)
             ASSERT(n < Size);
-        return Data[n / 8].get(n % 8);
+        return Data[n / BitsX].get(n % BitsX);
     }
 
     uint16_t size() const { return Size; }
