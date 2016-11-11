@@ -23,6 +23,14 @@
 namespace emb {
 
 template<class T, uint16_t Size, bool checkRange = true>
+class array;
+
+template<uint16_t Size, class T = uint8_t, bool checkRange = true>
+class bit_array;
+
+
+
+template<class T, uint16_t Size, bool checkRange>
 class array {
 public:
     typedef T type;
@@ -45,7 +53,9 @@ private:
     type Data[Size];
 };
 
-template<uint16_t Size, class T = uint8_t, bool checkRange = true>
+
+
+template<uint16_t Size, class T, bool checkRange>
 class bit_array {
 public:
     typedef bool type;
@@ -100,6 +110,6 @@ private:
     array<boolX, SizeX, checkRange> Data;
 };
 
-}
+} /* namespace emb */
 
-#endif //__ARRAY_H__
+#endif /* __ARRAY_H__ */
