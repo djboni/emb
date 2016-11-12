@@ -41,9 +41,12 @@ class prng;
  (no checks are performed).
 
  The Hash class must:
- - Be default constructible
  - Define this constant static integer:
     static const int8_t size  -  Hash size in bytes
+ - Define (or leave default) constructors and assignment:
+   Hash()                     -  Default constructor
+   Hash(const Hash&)          -  Copy constructor
+   operator=(const Hash&)     -  Copy assignment
  - Define these member functions:
     init()                    -  Initialize the Hash object
     update(uint8_t data)      -  Update the Hash value
@@ -62,18 +65,33 @@ public:
     /** Set entropy pool with seed_val. Previous entropy is lost. */
     template<class T> void seed(const T& seedVal);
 
-    /** Add entropy to the entropy pool. */
+    /** Add entropy to the entropy pool. entropyVal is XORed with the
+     current EntropyPool. */
     void addEntropy(const uint8_t (&entropyVal)[PoolSize]);
 
     /** Get a pseudo-random number of type T. */
     template<class T> T rand();
 
 private:
-    uint8_t EntrpyPool[PoolSize];
-    UintCounter Counter;
+    /* Pre-calculate EntropyPool hash. */
+    void calcPoolHash();
+
+    Hash PoolHash; /* Pre-calculated EntropyPool hash. Speeds-up number generation. */
+    UintCounter Counter; /* Counter to be hashed with Entropy Pool to generate random numbers. */
+    uint8_t EntrpyPool[PoolSize]; /* Entropy pool. */
 };
 
 
+
+template<uint16_t PoolSizeBits, class Hash, class UintCounter>
+void prng<PoolSizeBits, Hash, UintCounter>::calcPoolHash()
+{
+    Hash hash;
+    hash.init();
+    for(uint8_t i = 0U; i < PoolSize; ++i)
+        hash.update(EntrpyPool[i]);
+    PoolHash = hash;
+}
 
 template<uint16_t PoolSizeBits, class Hash, class UintCounter>
 template<class T>
@@ -85,6 +103,8 @@ void prng<PoolSizeBits, Hash, UintCounter>::seed(const T& seedVal)
         EntrpyPool[i] = *pSeedVal++;
     for( ; i < sizeof(EntrpyPool); ++i)
         EntrpyPool[i] = 0U;
+
+    calcPoolHash();
 }
 
 template<uint16_t PoolSizeBits, class Hash, class UintCounter>
@@ -92,6 +112,8 @@ void prng<PoolSizeBits, Hash, UintCounter>::addEntropy(const uint8_t (&entropyVa
 {
     for(uint8_t i = 0U; i < sizeof(EntrpyPool); ++i)
         EntrpyPool[i] ^= entropyVal[i];
+
+    calcPoolHash();
 }
 
 template<uint16_t PoolSizeBits, class Hash, class UintCounter>
@@ -103,12 +125,7 @@ T prng<PoolSizeBits, Hash, UintCounter>::rand()
     uint8_t c = 0;
     uint8_t* pRandval = reinterpret_cast<uint8_t*>(&randval);
     do {
-        Hash hash;
-
-        hash.init();
-        for(uint8_t i = 0U; i < PoolSize; ++i)
-        hash.update(EntrpyPool[i]);
-
+        Hash hash(PoolHash);
         UintCounter localCounter = Counter++;
 
         const uint8_t* pLocalCounter =
