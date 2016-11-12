@@ -66,11 +66,11 @@ public:
     void addEntropy(const uint8_t (&entropyVal)[PoolSize]);
 
     /** Get a pseudo-random number of type T. */
-    template<class T> T rand() const;
+    template<class T> T rand();
 
 private:
     uint8_t EntrpyPool[PoolSize];
-    mutable UintCounter Counter;
+    UintCounter Counter;
 };
 
 
@@ -96,7 +96,7 @@ void prng<PoolSizeBits, Hash, UintCounter>::addEntropy(const uint8_t (&entropyVa
 
 template<uint16_t PoolSizeBits, class Hash, class UintCounter>
 template<class T>
-T prng<PoolSizeBits, Hash, UintCounter>::rand() const
+T prng<PoolSizeBits, Hash, UintCounter>::rand()
 {
     T randval;
 
